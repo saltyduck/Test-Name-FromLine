@@ -7,6 +7,8 @@ our $VERSION = '0.13';
 
 use Test::Builder;
 use File::Slurp;
+use Encode;
+use Encode::Guess qw/utf-8 us-ascii/;
 use File::Spec;
 use Cwd qw(getcwd);
 
@@ -22,7 +24,7 @@ my $ORIGINAL_ok = \&Test::Builder::ok;
 		undef $filename if $filename && $filename eq '-e';
 		if ($filename) {
 			$filename = File::Spec->rel2abs($filename, $BASE_DIR);
-			my $file = $filecache{$filename} ||= [ read_file($filename) ];
+			my $file = $filecache{$filename} ||= [ map { decode('Guess', $_) } read_file($filename) ];
 			my $lnum = $line;
 			$line = $file->[$lnum-1];
 			$line =~ s{^\s+|\s+$}{}g;
